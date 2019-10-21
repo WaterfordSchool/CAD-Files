@@ -85,6 +85,9 @@ public class Robot extends IterativeRobot {
    public boolean getButtonStart(Joystick joy){
      return joy.getRawButton(10);
   }
+  public void LL(){
+    
+  }
 
    @Override
   public void robotInit() {
