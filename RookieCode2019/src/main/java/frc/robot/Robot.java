@@ -36,7 +36,7 @@ public class Robot extends IterativeRobot {
   DifferentialDrive tDrive = new DifferentialDrive (Left, Right);
   Joystick drivercontroller = new Joystick (0);
   Joystick operatorcontroller = new Joystick (1);
-	JoystickButton rightTrigger = new JoystickButton (operatorcontroller, 8);
+  
 /** CoconutGun is the ball shooter/roller
 as a tribute to Funky Kong, it is the coconut gun.
 funky kong for those of you who dont know,
@@ -111,11 +111,11 @@ ooh ooh ahh ahh ahh
    */
   @Override
   public void teleopPeriodic() {
-  tDrive.tankDrive(-drivercontroller.getY(), -drivercontroller.getAxis(AxisType.kThrottle));
-  if (operatorcontroller.getY() > 0.05) {
+  tDrive.tankDrive(-drivercontroller.getY(), -drivercontroller.getRawAxis(3));
+  if (operatorcontroller.getY() > 0.70) {
 		CoconutGun.set(operatorcontroller.getY());
 	}
-	else if(operatorcontroller.getY() < -0.05){
+	else if(operatorcontroller.getY() < -0.70){
 		CoconutGun.set(operatorcontroller.getY());
 	}
 	else {
