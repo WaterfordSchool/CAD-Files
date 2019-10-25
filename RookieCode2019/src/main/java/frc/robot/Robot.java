@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,7 +37,9 @@ public class Robot extends IterativeRobot {
   DifferentialDrive tDrive = new DifferentialDrive (Left, Right);
   Joystick drivercontroller = new Joystick (0);
   Joystick operatorcontroller = new Joystick (1);
+  double speed = 0.6;
   
+  private double autoStartTime;
 /** CoconutGun is the ball shooter/roller
 as a tribute to Funky Kong, it is the coconut gun.
 funky kong for those of you who dont know,
@@ -88,6 +91,8 @@ ooh ooh ahh ahh ahh
     // autoSelected = SmartDashboard.getString("Auto Selector",
     // defaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+    autoStartTime = Timer.getFPGATimestamp();
+		
   }
 
   /**
@@ -95,14 +100,18 @@ ooh ooh ahh ahh ahh
    */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+
+   double currentTime = Timer.getFPGATimestamp();
+   double timeElapsed = currentTime - autoStartTime;
+   if (timeElapsed < 6){ //drive forward for 6 seconds
+     tDrive.tankDrive(speed, speed);
+     }
+    else if (timeElapsed < 8){
+      CoconutGun.set(0.6);
+    }
+    else {
+      tDrive.tankDrive(0.0, 0.0);
+      CoconutGun.set(0.0);
     }
   }
 
@@ -112,10 +121,10 @@ ooh ooh ahh ahh ahh
   @Override
   public void teleopPeriodic() {
   tDrive.tankDrive(-drivercontroller.getY(), -drivercontroller.getRawAxis(3));
-  if (operatorcontroller.getY() > 0.70) {
+  if (operatorcontroller.getRawButton(7)) {
 		CoconutGun.set(operatorcontroller.getY());
 	}
-	else if(operatorcontroller.getY() < -0.70){
+	else if(operatorcontroller.getRawButton(6) == false){
 		CoconutGun.set(operatorcontroller.getY());
 	}
 	else {
