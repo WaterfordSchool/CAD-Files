@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.*;
 
 
 /**
@@ -46,6 +47,7 @@ public class Robot extends IterativeRobot {
   public DifferentialDrive tankDrive = new DifferentialDrive(left, right);
   public Joystick driver = new Joystick(0);
   public Joystick operator = new Joystick(1);
+
   boolean arcade;
   boolean target=false;
   double drive = 0.0;
@@ -86,7 +88,30 @@ public class Robot extends IterativeRobot {
      return joy.getRawButton(10);
   }
   public void LL(){
-    
+   final double STEER = 0.03;
+   final double DRIVE = 0.26;
+   final double AREA = 2.0; //area
+   final double MAXDRIVE = 0.7;
+
+   tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+   tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+   ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+   ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+   if(tv < 1.0){
+     target = false;
+     drive = 0.0;
+     steer = 0.0;
+   } else {
+    target = true;
+    steer = tx * STEER;
+    drive = (AREA - ta)*DRIVE; 
+
+    if(drive > MAXDRIVE){
+      drive = MAXDRIVE;
+    }
+
+    }
   }
 
    @Override
@@ -149,12 +174,22 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void teleopPeriodic() {
-    arcade=getButtonStart(driver);
+
+    LL();
+    arcade=driver.getRawButton(12);
+    if(driver.getRawButton(1)){
+      if(target){
+        tankDrive.arcadeDrive(-drive, -steer);
+      }
+    }else
+
     if (!arcade){
       drive(driver.getRawAxis(1), driver.getRawAxis(3));
     }else {
       drive(driver.getRawAxis(0), driver.getRawAxis(1));
     }
+
+
   }
 
   /**
